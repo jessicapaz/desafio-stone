@@ -1,18 +1,22 @@
 package main
 
 import (
-    "github.com/jessicapaz/desafio-stone/handlers"
-    "github.com/labstack/echo/middleware"
-    "github.com/labstack/echo"
+	"github.com/jessicapaz/desafio-stone/handlers"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 func main() {
-    e := echo.New()
+	// Echo instance
+	e := echo.New()
 
-    e.Use(middleware.Logger())
-    e.Use(middleware.Recover())
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
-    e.GET("/", handlers.HealthCheck)
+	// Route
+	e.GET("/", handlers.HealthCheck)
 
-    e.Logger.Fatal(e.Start(":8966"))
+	// Start server
+	e.Logger.Fatal(e.Start(":8966"))
 }

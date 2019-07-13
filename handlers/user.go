@@ -18,8 +18,11 @@ func CreateUser(c echo.Context) error {
 	}
 	err := user.Create()
 	if err != nil {
+		resp.Email = user.Email
 		resp.Message = "Unable to create user"
 		return c.JSON(http.StatusBadRequest, resp)
 	}
-	return c.JSON(http.StatusCreated, user)
+	resp.Email = user.Email
+	resp.Message = "User created!"
+	return c.JSON(http.StatusCreated, resp)
 }

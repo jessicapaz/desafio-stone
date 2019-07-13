@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	userJSON = `{"email":"j@mail.com","password":"12345678"}`
+	userJSON = `{"email":"j@mail.com","message":"User created!"}`
 )
 
 func TestCreateUser(t *testing.T) {

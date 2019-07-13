@@ -2,10 +2,6 @@ version: '3'
 services:
   db:
     image: postgres
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: postgres
   web:
     build: .
     command: ["go", "run", "main.go"]

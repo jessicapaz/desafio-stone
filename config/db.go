@@ -1,21 +1,15 @@
-package main
+package config
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 var db *sql.DB
 
 func init() {
-	dbUser := os.Getenv("POSTGRES_USER")
-	dbPassword := os.Getenv("POSTGRES_PASSWORD")
-	dbName := os.Getenv("POSTGRES_DB")
-
-	dbInfo := fmt.Sprintf("host=db user=%s dbname=%s password=%s sslmode=disable", dbUser, dbName, dbPassword)
+	dbInfo := "postgresql://postgres:postgres@db:5432/postgres?sslmode=disable"
 	conn, err := sql.Open("postgres", dbInfo)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -26,9 +20,28 @@ func init() {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"error": err,
-		}).Fatal("unable to connect to database")
+		}).Fatal("failed to ping to database")
 	}
 	db = conn
+	err = createUsersTable(db)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+		}).Fatal("failed to create users table")
+	}
+}
+
+func createUsersTable(db *sql.DB) error {
+	stmt := `CREATE TABLE IF NOT EXISTS users(
+		id SERIAL PRIMARY KEY,
+		email VARCHAR(300) NOT NULL,
+		password VARCHAR(300) NOT NULL
+	);`
+	_, err := db.Exec(stmt)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetDB returns the database instance

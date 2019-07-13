@@ -34,7 +34,7 @@ func init() {
 func createUsersTable(db *sql.DB) error {
 	stmt := `CREATE TABLE IF NOT EXISTS users(
 		id SERIAL PRIMARY KEY,
-		email VARCHAR(300) NOT NULL,
+		email VARCHAR(300) NOT NULL UNIQUE,
 		password VARCHAR(300) NOT NULL
 	);`
 	_, err := db.Exec(stmt)

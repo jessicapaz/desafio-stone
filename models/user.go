@@ -22,3 +22,14 @@ func (user *User) Create() error {
 	}
 	return nil
 }
+
+// ByEmail gets user by email
+func (user *User) ByEmail() (*User, error) {
+	u := new(User)
+	stmt := "SELECT email, password FROM users WHERE email=$1"
+	result := config.GetDB().QueryRow(stmt, user.Email)
+	if err := result.Scan(&u.Email, &u.Password); err != nil {
+		return user, err
+	}
+	return u, nil
+}

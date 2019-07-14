@@ -7,22 +7,33 @@ import (
 	"net/http"
 )
 
+type userHandler struct {
+	UserModel models.UserModelImpl
+}
+
+func NewUserHandler(u models.UserModelImpl) *userHandler {
+	return &userHandler{u}
+}
+
 // CreateUser handler
-func CreateUser(c echo.Context) error {
+func (h *userHandler) CreateUser(c echo.Context) error {
 	user := new(models.User)
 	resp := renderings.UserResponse{}
 	if err := c.Bind(user); err != nil {
-		resp.Email = user.Email
 		resp.Message = "Unable to bind request"
 		return c.JSON(http.StatusBadRequest, resp)
 	}
-	err := user.Create()
+	if err := user.Validate(); err != nil {
+		resp.Message = err.Error()
+		return c.JSON(http.StatusBadRequest, resp)
+	}
+	u, err := h.UserModel.Create(user)
 	if err != nil {
-		resp.Email = user.Email
 		resp.Message = "Unable to create user"
 		return c.JSON(http.StatusBadRequest, resp)
 	}
-	resp.Email = user.Email
-	resp.Message = "User created!"
+	resp.ID = u.ID
+	resp.Email = u.Email
+	resp.Message = "User created"
 	return c.JSON(http.StatusCreated, resp)
 }

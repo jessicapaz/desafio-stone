@@ -13,7 +13,7 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	resp := renderings.UserResponse{}
 	if err := c.Bind(user); err != nil {
 		resp.Message = "Unable to bind request"
-		return c.JSON(http.StatusBadRequest, resp)
+		return c.JSON(http.StatusUnprocessableEntity, resp)
 	}
 	if err := user.Validate(); err != nil {
 		resp.Message = err.Error()
@@ -22,7 +22,7 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	u, err := h.UserModel.Create(user)
 	if err != nil {
 		resp.Message = "Unable to create user"
-		return c.JSON(http.StatusBadRequest, resp)
+		return c.JSON(http.StatusInternalServerError, resp)
 	}
 	resp.ID = u.ID
 	resp.Email = u.Email

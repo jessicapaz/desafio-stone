@@ -13,7 +13,7 @@ func (h *Handler) Login(c echo.Context) error {
 	resp := renderings.LoginResponse{}
 	if err := c.Bind(user); err != nil {
 		resp.Message = "Unable to bind request"
-		return c.JSON(http.StatusBadRequest, resp)
+		return c.JSON(http.StatusUnprocessableEntity, resp)
 	}
 	token, err := h.LoginService.Login(user)
 	if err != nil {

@@ -7,16 +7,8 @@ import (
 	"net/http"
 )
 
-type userHandler struct {
-	UserModel models.UserModelImpl
-}
-
-func NewUserHandler(u models.UserModelImpl) *userHandler {
-	return &userHandler{u}
-}
-
 // CreateUser handler
-func (h *userHandler) CreateUser(c echo.Context) error {
+func (h *Handler) CreateUser(c echo.Context) error {
 	user := new(models.User)
 	resp := renderings.UserResponse{}
 	if err := c.Bind(user); err != nil {

@@ -18,12 +18,12 @@ func main() {
 	e.Use(middleware.Recover())
 
 	db := config.GetDB()
-	userH := handlers.NewUserHandler(models.NewUserModel(db))
-	loginH := handlers.NewLoginHandler(services.NewLoginService())
+	handler := handlers.NewHandler(models.NewUserModel(db), services.NewLoginService())
+
 	// Route
 	e.GET("/", handlers.HealthCheck)
-	e.POST("/users", userH.CreateUser)
-	e.POST("/login", loginH.Login)
+	e.POST("/users", handler.CreateUser)
+	e.POST("/login", handler.Login)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8966"))

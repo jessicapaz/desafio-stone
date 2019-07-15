@@ -3,21 +3,12 @@ package handlers
 import (
 	"github.com/jessicapaz/desafio-stone/models"
 	"github.com/jessicapaz/desafio-stone/renderings"
-	"github.com/jessicapaz/desafio-stone/services"
 	"github.com/labstack/echo"
 	"net/http"
 )
 
-type loginHandler struct {
-	LoginService services.LoginService
-}
-
-func NewLoginHandler(l services.LoginService) *loginHandler {
-	return &loginHandler{l}
-}
-
 // Login handler
-func (h loginHandler) Login(c echo.Context) error {
+func (h *Handler) Login(c echo.Context) error {
 	user := new(models.User)
 	resp := renderings.LoginResponse{}
 	if err := c.Bind(user); err != nil {

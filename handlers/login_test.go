@@ -25,7 +25,7 @@ func TestLogin(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	l := &loginService{}
-	h := NewLoginHandler(l)
+	h := NewHandler(nil, l)
 
 	var want = `{"message":"Success","token":"secret"}`
 	if assert.NoError(t, h.Login(c)) {

@@ -11,7 +11,7 @@ import (
 )
 
 // LoginService describes all methods of a LoginService
-type LoginService interface {
+type LoginImpl interface {
 	Login(user *models.User) (token string, err error)
 }
 
@@ -20,15 +20,15 @@ type jwtLoginClaims struct {
 	jwt.StandardClaims
 }
 
-type loginService struct{}
+type LoginService struct{}
 
 // NewLoginService creates a new loginService
-func NewLoginService() *loginService {
-	return new(loginService)
+func NewLoginService() *LoginService {
+	return &LoginService{}
 }
 
 // Login service create a jwt token for a user
-func (l *loginService) Login(user *models.User) (token string, err error) {
+func (l *LoginService) Login(user *models.User) (token string, err error) {
 	userModel := models.NewUserModel(config.GetDB())
 	u, err := userModel.ByEmail(user.Email)
 	if err != nil {
@@ -41,9 +41,16 @@ func (l *loginService) Login(user *models.User) (token string, err error) {
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		return "", errors.New("Invalid login credentials")
 	}
+	token, err = createToken(user.Email)
+	if err != nil {
+		return "", errors.New("Unable to create token")
+	}
+	return token, nil
+}
 
+func createToken(email string) (token string, err error) {
 	claims := &jwtLoginClaims{
-		user.Email,
+		email,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
 		},
@@ -51,5 +58,8 @@ func (l *loginService) Login(user *models.User) (token string, err error) {
 
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err = t.SignedString([]byte(os.Getenv("TOKEN_PASSWORD")))
+	if err != nil {
+		return token, err
+	}
 	return token, nil
 }

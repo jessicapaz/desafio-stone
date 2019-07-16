@@ -6,13 +6,13 @@ import (
 )
 
 type Handler struct {
-	UserModel models.UserModelImpl
+	UserModel    models.UserModelImpl
 	LoginService services.LoginImpl
 }
 
 func NewHandler(u models.UserModelImpl, l services.LoginImpl) *Handler {
 	return &Handler{
-		UserModel: u,
+		UserModel:    u,
 		LoginService: l,
 	}
 }

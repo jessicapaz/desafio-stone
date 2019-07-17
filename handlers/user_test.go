@@ -36,7 +36,7 @@ func TestCreateUser(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		u := &UserModel{}
-		h := NewHandler(u, nil)
+		h := NewHandler(u, nil, nil)
 
 		var want = `{"message":"User created","id":1,"email":"j@mail.com"}`
 		if assert.NoError(t, h.CreateUser(c)) {
@@ -53,7 +53,7 @@ func TestCreateUser(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		u := &UserModel{}
-		h := NewHandler(u, nil)
+		h := NewHandler(u, nil, nil)
 
 		var want = `{"message":"password must not be empty"}`
 		if assert.NoError(t, h.CreateUser(c)) {

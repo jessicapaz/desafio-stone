@@ -1,0 +1,54 @@
+package models
+
+import (
+	"database/sql"
+	"time"
+)
+
+// Invoice model
+type Invoice struct {
+	ID             int        `json:"id"`
+	ReferenceMonth int        `json:"reference_month"`
+	ReferenceYear  int        `json:"reference_year"`
+	Document       string     `json:"document"`
+	Description    string     `json:"description"`
+	Amount         float64    `json:"amount"`
+	IsActive       int        `json:"is_active"`
+	CreatedAt      time.Time  `json:"created_at"`
+	DeactivatedAt  *time.Time `json:"deactivated_at"`
+}
+
+// InvoiceModelImpl describes all methods of a InvoiceModel
+type InvoiceModelImpl interface {
+	Create(i *Invoice) (Invoice, error)
+}
+
+type InvoiceModel struct {
+	db *sql.DB
+}
+
+// NewInvoiceModel creates a new InvoiceModel
+func NewInvoiceModel(db *sql.DB) *InvoiceModel {
+	return &InvoiceModel{
+		db: db,
+	}
+}
+
+// Create creates a invoice on database
+func (i *InvoiceModel) Create(invoice *Invoice) (Invoice, error) {
+	newInvoice := Invoice{}
+	stmt := `INSERT INTO invoices (
+		reference_month,
+		reference_year,
+		document,
+		description,
+		amount,
+		is_active,
+		created_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;`
+	result := i.db.QueryRow(stmt, invoice.ReferenceMonth, invoice.ReferenceYear, invoice.Document, invoice.Description, invoice.Amount, 1, time.Now())
+	err := result.Scan(&newInvoice.ID, &newInvoice.ReferenceMonth, &newInvoice.ReferenceYear, &newInvoice.Document, &newInvoice.Description, newInvoice.Amount, &newInvoice.IsActive, &newInvoice.CreatedAt, &newInvoice.DeactivatedAt)
+	if err != nil {
+		return newInvoice, err
+	}
+	return newInvoice, nil
+}

@@ -18,7 +18,11 @@ func main() {
 	e.Use(middleware.Recover())
 
 	db := config.GetDB()
-	handler := handlers.NewHandler(models.NewUserModel(db), services.NewLoginService())
+	handler := handlers.NewHandler(
+		models.NewUserModel(db),
+		services.NewLoginService(),
+		models.NewInvoiceModel(db),
+	)
 
 	// Route
 	e.GET("/", handlers.HealthCheck)

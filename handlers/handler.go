@@ -8,11 +8,13 @@ import (
 type Handler struct {
 	UserModel    models.UserModelImpl
 	LoginService services.LoginImpl
+	InvoiceModel models.InvoiceModelImpl
 }
 
-func NewHandler(u models.UserModelImpl, l services.LoginImpl) *Handler {
+func NewHandler(u models.UserModelImpl, l services.LoginImpl, i models.InvoiceModelImpl) *Handler {
 	return &Handler{
 		UserModel:    u,
 		LoginService: l,
+		InvoiceModel: i,
 	}
 }

@@ -23,5 +23,13 @@ func (h *Handler) ListInvoice(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
+	document := c.QueryParam("document")
+	if document != "" {
+		in, err := h.InvoiceModel.ByDocument(document)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+		return c.JSON(http.StatusOK, in)
+	}
 	return c.JSON(http.StatusOK, i)
 }

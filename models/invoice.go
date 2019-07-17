@@ -22,6 +22,7 @@ type Invoice struct {
 type InvoiceModelImpl interface {
 	Create(i *Invoice) (Invoice, error)
 	List() ([]Invoice, error)
+	ByDocument(document string) ([]Invoice, error)
 }
 
 type InvoiceModel struct {
@@ -60,6 +61,26 @@ func (i *InvoiceModel) List() ([]Invoice, error) {
 	invoices := []Invoice{}
 	stmt := `SELECT * FROM invoices;`
 	result, err := i.db.Query(stmt)
+	if err != nil {
+		return invoices, err
+	}
+	defer result.Close()
+
+	for result.Next() {
+		invoice := Invoice{}
+		err := result.Scan(&invoice.ID, &invoice.ReferenceMonth, &invoice.ReferenceYear, &invoice.Document, &invoice.Description, &invoice.Amount, &invoice.IsActive, &invoice.CreatedAt, &invoice.DeactivatedAt)
+		if err != nil {
+			return invoices, err
+		}
+		invoices = append(invoices, invoice)
+	}
+	return invoices, nil
+}
+
+func (i *InvoiceModel) ByDocument(document string) ([]Invoice, error) {
+	invoices := []Invoice{}
+	stmt := `SELECT * FROM invoices WHERE document=$1;`
+	result, err := i.db.Query(stmt, document)
 	if err != nil {
 		return invoices, err
 	}

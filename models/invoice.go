@@ -21,6 +21,7 @@ type Invoice struct {
 // InvoiceModelImpl describes all methods of a InvoiceModel
 type InvoiceModelImpl interface {
 	Create(i *Invoice) (Invoice, error)
+	List() ([]Invoice, error)
 }
 
 type InvoiceModel struct {
@@ -44,11 +45,33 @@ func (i *InvoiceModel) Create(invoice *Invoice) (Invoice, error) {
 		description,
 		amount,
 		is_active,
-		created_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;`
+		created_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;`
 	result := i.db.QueryRow(stmt, invoice.ReferenceMonth, invoice.ReferenceYear, invoice.Document, invoice.Description, invoice.Amount, 1, time.Now())
-	err := result.Scan(&newInvoice.ID, &newInvoice.ReferenceMonth, &newInvoice.ReferenceYear, &newInvoice.Document, &newInvoice.Description, newInvoice.Amount, &newInvoice.IsActive, &newInvoice.CreatedAt, &newInvoice.DeactivatedAt)
+	err := result.Scan(&newInvoice.ID, &newInvoice.ReferenceMonth, &newInvoice.ReferenceYear, &newInvoice.Document, &newInvoice.Description, &newInvoice.Amount, &newInvoice.IsActive, &newInvoice.CreatedAt, &newInvoice.DeactivatedAt)
 	if err != nil {
 		return newInvoice, err
 	}
 	return newInvoice, nil
+}
+
+// List list all invoices
+func (i *InvoiceModel) List() ([]Invoice, error) {
+	invoices := []Invoice{}
+	stmt := `SELECT * FROM invoices;`
+	result, err := i.db.Query(stmt)
+	if err != nil {
+		return invoices, err
+	}
+	defer result.Close()
+
+	for result.Next() {
+		invoice := Invoice{}
+		err := result.Scan(&invoice.ID, &invoice.ReferenceMonth, &invoice.ReferenceYear, &invoice.Document, &invoice.Description, &invoice.Amount, &invoice.IsActive, &invoice.CreatedAt, &invoice.DeactivatedAt)
+		if err != nil {
+			return invoices, err
+		}
+		invoices = append(invoices, invoice)
+	}
+	return invoices, nil
 }

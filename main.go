@@ -1,12 +1,15 @@
 package main
 
 import (
+	"os"
+
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+
 	"github.com/jessicapaz/desafio-stone/config"
 	"github.com/jessicapaz/desafio-stone/handlers"
 	"github.com/jessicapaz/desafio-stone/models"
 	"github.com/jessicapaz/desafio-stone/services"
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 )
 
 func main() {
@@ -28,6 +31,11 @@ func main() {
 	e.GET("/", handlers.HealthCheck)
 	e.POST("/users", handler.CreateUser)
 	e.POST("/login", handler.Login)
+
+	r := e.Group("/invoices")
+	r.Use(middleware.JWT([]byte(os.Getenv("TOKEN_PASSWORD"))))
+	r.POST("", handler.CreateInvoice)
+	r.GET("", handler.ListInvoice)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8966"))

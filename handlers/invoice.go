@@ -17,3 +17,11 @@ func (h *Handler) CreateInvoice(c echo.Context) error {
 	}
 	return c.JSON(http.StatusCreated, i)
 }
+
+func (h *Handler) ListInvoice(c echo.Context) error {
+	i, err := h.InvoiceModel.List()
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, i)
+}

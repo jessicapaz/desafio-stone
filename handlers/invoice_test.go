@@ -29,6 +29,21 @@ func (i InvoiceModel) Create(invoice *models.Invoice) (models.Invoice, error) {
 	}, nil
 }
 
+func (i InvoiceModel) List() ([]models.Invoice, error) {
+	datetime, _ := time.Parse("2006-01-02T15:04:05-070", "2019-05-02T15:04:05-070")
+	invoice := models.Invoice{
+		ID:             1,
+		ReferenceMonth: 2,
+		ReferenceYear:  2017,
+		Document:       "0324566545",
+		Description:    "Some notes",
+		Amount:         38.90,
+		IsActive:       1,
+		CreatedAt:      datetime,
+	}
+	return []models.Invoice{invoice}, nil
+}
+
 func TestCreateInvoice(t *testing.T) {
 	e := echo.New()
 	invoiceJSON := `{"reference_month":2,"reference_year":2017,"document":"0324566545",
@@ -41,9 +56,26 @@ func TestCreateInvoice(t *testing.T) {
 	i := &InvoiceModel{}
 	h := NewHandler(nil, nil, i)
 
-	want := `{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.90,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00", "decativated_at": null}`
+	want := `{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00","deactivated_at":null}`
 	if assert.NoError(t, h.CreateInvoice(c)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
+		assert.Equal(t, want+"\n", rec.Body.String())
+	}
+}
+
+func TestListInvoice(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/invoices", nil)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	i := &InvoiceModel{}
+	h := NewHandler(nil, nil, i)
+
+	want := `[{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00","deactivated_at":null}]`
+	if assert.NoError(t, h.ListInvoice(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Equal(t, want+"\n", rec.Body.String())
 	}
 }

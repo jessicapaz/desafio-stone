@@ -23,6 +23,8 @@ type InvoiceModelImpl interface {
 	Create(i *Invoice) (Invoice, error)
 	List() ([]Invoice, error)
 	ByDocument(document string) ([]Invoice, error)
+	ByMonth(month int) ([]Invoice, error)
+	ByYear(year int) ([]Invoice, error)
 }
 
 type InvoiceModel struct {
@@ -81,6 +83,46 @@ func (i *InvoiceModel) ByDocument(document string) ([]Invoice, error) {
 	invoices := []Invoice{}
 	stmt := `SELECT * FROM invoices WHERE document=$1;`
 	result, err := i.db.Query(stmt, document)
+	if err != nil {
+		return invoices, err
+	}
+	defer result.Close()
+
+	for result.Next() {
+		invoice := Invoice{}
+		err := result.Scan(&invoice.ID, &invoice.ReferenceMonth, &invoice.ReferenceYear, &invoice.Document, &invoice.Description, &invoice.Amount, &invoice.IsActive, &invoice.CreatedAt, &invoice.DeactivatedAt)
+		if err != nil {
+			return invoices, err
+		}
+		invoices = append(invoices, invoice)
+	}
+	return invoices, nil
+}
+
+func (i *InvoiceModel) ByMonth(month int) ([]Invoice, error) {
+	invoices := []Invoice{}
+	stmt := `SELECT * FROM invoices WHERE month=$1;`
+	result, err := i.db.Query(stmt, month)
+	if err != nil {
+		return invoices, err
+	}
+	defer result.Close()
+
+	for result.Next() {
+		invoice := Invoice{}
+		err := result.Scan(&invoice.ID, &invoice.ReferenceMonth, &invoice.ReferenceYear, &invoice.Document, &invoice.Description, &invoice.Amount, &invoice.IsActive, &invoice.CreatedAt, &invoice.DeactivatedAt)
+		if err != nil {
+			return invoices, err
+		}
+		invoices = append(invoices, invoice)
+	}
+	return invoices, nil
+}
+
+func (i *InvoiceModel) ByYear(year int) ([]Invoice, error) {
+	invoices := []Invoice{}
+	stmt := `SELECT * FROM invoices WHERE year=$1;`
+	result, err := i.db.Query(stmt, year)
 	if err != nil {
 		return invoices, err
 	}

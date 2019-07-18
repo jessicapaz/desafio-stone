@@ -9,6 +9,7 @@ import (
 	"github.com/jessicapaz/desafio-stone/models"
 )
 
+// CreateInvoice handler
 func (h *Handler) CreateInvoice(c echo.Context) error {
 	invoice := &models.Invoice{}
 	if err := c.Bind(invoice); err != nil {
@@ -21,6 +22,7 @@ func (h *Handler) CreateInvoice(c echo.Context) error {
 	return c.JSON(http.StatusCreated, i)
 }
 
+// ListInvoice handler
 func (h *Handler) ListInvoice(c echo.Context) error {
 	i, err := h.InvoiceModel.List()
 	if err != nil {
@@ -55,6 +57,7 @@ func (h *Handler) ListInvoice(c echo.Context) error {
 	return c.JSON(http.StatusOK, i)
 }
 
+// DeactivateInvoice handler
 func (h *Handler) DeactivateInvoice(c echo.Context) error {
 	id := c.Param("id")
 	idInt, _ := strconv.Atoi(id)

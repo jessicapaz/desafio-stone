@@ -62,6 +62,9 @@ func (h *Handler) DeactivateInvoice(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusNotFound, "Invoice not found")
 	}
-	i := h.InvoiceModel.Deactivate(&invoice)
+	i, err := h.InvoiceModel.Deactivate(&invoice)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
 	return c.JSON(http.StatusOK, i)
 }

@@ -72,11 +72,11 @@ func (i InvoiceModel) ByID(id int) (models.Invoice, error) {
 	return invoice_data_1, nil
 }
 
-func (i InvoiceModel) Deactivate(invoice *models.Invoice) models.Invoice {
+func (i InvoiceModel) Deactivate(invoice *models.Invoice) (models.Invoice, error) {
 	datetime, _ = time.Parse("2006-01-02T15:04:05-070", "2019-05-02T15:04:05-070")
 	invoice_data_1.IsActive = 0
 	invoice_data_1.DeactivatedAt = &datetime
-	return invoice_data_1
+	return invoice_data_1, nil
 }
 
 func TestCreateInvoice(t *testing.T) {

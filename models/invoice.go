@@ -31,7 +31,7 @@ type InvoiceModelImpl interface {
 	ByMonth(month int) ([]Invoice, error)
 	ByYear(year int) ([]Invoice, error)
 	ByID(id int) (Invoice, error)
-	Deactivate(invoice *Invoice) Invoice
+	Deactivate(invoice *Invoice) (Invoice, error)
 }
 
 type InvoiceModel struct {
@@ -162,9 +162,13 @@ func (i *InvoiceModel) ByID(id int) (Invoice, error) {
 }
 
 // Deactivate change invoice status from activated to deactivated
-func (i *InvoiceModel) Deactivate(invoice *Invoice) Invoice {
-	invoice.IsActive = deactivated
-	now := time.Now()
-	invoice.DeactivatedAt = &now
-	return *invoice
+func (i *InvoiceModel) Deactivate(invoice *Invoice) (Invoice, error) {
+	returnInvoice := Invoice{}
+	stmt := `UPDATE invoices SET is_active=$1, deactivated_at=$2 WHERE id=$3 RETURNING *;`
+	result := i.db.QueryRow(stmt, deactivated, time.Now(), invoice.ID)
+	err := result.Scan(&returnInvoice.ID, &returnInvoice.ReferenceMonth, &returnInvoice.ReferenceYear, &returnInvoice.Document, &returnInvoice.Description, &returnInvoice.Amount, &returnInvoice.IsActive, &returnInvoice.CreatedAt, &returnInvoice.DeactivatedAt)
+	if err != nil {
+		return returnInvoice, err
+	}
+	return returnInvoice, nil
 }

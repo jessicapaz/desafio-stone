@@ -36,6 +36,7 @@ func main() {
 	r.Use(middleware.JWT([]byte(os.Getenv("TOKEN_PASSWORD"))))
 	r.POST("", handler.CreateInvoice)
 	r.GET("", handler.ListInvoice)
+	r.DELETE("/:id", handler.DeactivateInvoice)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8966"))

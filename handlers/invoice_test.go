@@ -68,6 +68,17 @@ func (i InvoiceModel) ByYear(year int) ([]models.Invoice, error) {
 	return []models.Invoice{invoice_data_2}, nil
 }
 
+func (i InvoiceModel) ByID(id int) (models.Invoice, error) {
+	return invoice_data_1, nil
+}
+
+func (i InvoiceModel) Deactivate(invoice *models.Invoice) models.Invoice {
+	datetime, _ = time.Parse("2006-01-02T15:04:05-070", "2019-05-02T15:04:05-070")
+	invoice_data_1.IsActive = 0
+	invoice_data_1.DeactivatedAt = &datetime
+	return invoice_data_1
+}
+
 func TestCreateInvoice(t *testing.T) {
 	e := echo.New()
 	invoiceJSON := `{"reference_month":2,"reference_year":2017,"document":"0324566545",
@@ -80,7 +91,7 @@ func TestCreateInvoice(t *testing.T) {
 	i := &InvoiceModel{}
 	h := NewHandler(nil, nil, i)
 
-	want := `{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00","deactivated_at":null}`
+	want := `{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00"}`
 	if assert.NoError(t, h.CreateInvoice(c)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 		assert.Equal(t, want+"\n", rec.Body.String())
@@ -98,7 +109,7 @@ func TestListInvoice(t *testing.T) {
 		i := &InvoiceModel{}
 		h := NewHandler(nil, nil, i)
 
-		want := `[{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00","deactivated_at":null},{"id":2,"reference_month":3,"reference_year":2018,"document":"0324566548","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00","deactivated_at":null}]`
+		want := `[{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00"},{"id":2,"reference_month":3,"reference_year":2018,"document":"0324566548","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00"}]`
 		if assert.NoError(t, h.ListInvoice(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.Equal(t, want+"\n", rec.Body.String())
@@ -115,7 +126,7 @@ func TestListInvoice(t *testing.T) {
 		i := &InvoiceModel{}
 		h := NewHandler(nil, nil, i)
 
-		want := `[{"id":2,"reference_month":3,"reference_year":2018,"document":"0324566548","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00","deactivated_at":null}]`
+		want := `[{"id":2,"reference_month":3,"reference_year":2018,"document":"0324566548","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00"}]`
 		if assert.NoError(t, h.ListInvoice(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.Equal(t, want+"\n", rec.Body.String())
@@ -132,7 +143,7 @@ func TestListInvoice(t *testing.T) {
 		i := &InvoiceModel{}
 		h := NewHandler(nil, nil, i)
 
-		want := `[{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00","deactivated_at":null}]`
+		want := `[{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00"}]`
 		if assert.NoError(t, h.ListInvoice(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.Equal(t, want+"\n", rec.Body.String())
@@ -149,10 +160,27 @@ func TestListInvoice(t *testing.T) {
 		i := &InvoiceModel{}
 		h := NewHandler(nil, nil, i)
 
-		want := `[{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00","deactivated_at":null}]`
+		want := `[{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00"}]`
 		if assert.NoError(t, h.ListInvoice(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.Equal(t, want+"\n", rec.Body.String())
 		}
 	})
+}
+
+func TestDeactivateInvoice(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodDelete, "/invoices/1", nil)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	i := &InvoiceModel{}
+	h := NewHandler(nil, nil, i)
+
+	want := `{"id":1,"reference_month":2,"reference_year":2017,"document":"0324566545","description":"Some notes","amount":38.9,"is_active":0,"created_at":"2019-05-02T15:04:05-07:00","deactivated_at":"2019-05-02T15:04:05-07:00"}`
+	if assert.NoError(t, h.DeactivateInvoice(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, want+"\n", rec.Body.String())
+	}
 }

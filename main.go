@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
@@ -12,10 +13,18 @@ import (
 	"github.com/jessicapaz/desafio-stone/services"
 )
 
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
+
 func main() {
 	// Echo instance
 	e := echo.New()
-
+	e.Validator = &CustomValidator{validator: validator.New()}
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())

@@ -2,15 +2,14 @@ package models
 
 import (
 	"database/sql"
-	"errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // User model
 type User struct {
 	ID       int    `json:"id"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,gte=6"`
 }
 
 // UserModelImpl describes all methods of a UserModelImpl
@@ -28,17 +27,6 @@ func NewUserModel(db *sql.DB) *UserModel {
 	return &UserModel{
 		db: db,
 	}
-}
-
-// Validate validates user data
-func (user *User) Validate() error {
-	if user.Password == "" {
-		return errors.New("password must not be empty")
-	}
-	if user.Email == "" {
-		return errors.New("email must not be empty")
-	}
-	return nil
 }
 
 // Create creates a user on database

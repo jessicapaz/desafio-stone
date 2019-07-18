@@ -15,9 +15,8 @@ func (h *Handler) CreateUser(c echo.Context) error {
 		resp.Message = "Unable to bind request"
 		return c.JSON(http.StatusUnprocessableEntity, resp)
 	}
-	if err := user.Validate(); err != nil {
-		resp.Message = err.Error()
-		return c.JSON(http.StatusBadRequest, resp)
+	if err := c.Validate(user); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	u, err := h.UserModel.Create(user)
 	if err != nil {

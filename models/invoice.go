@@ -110,7 +110,7 @@ func (i *InvoiceModel) ByDocument(document string) ([]Invoice, error) {
 // ByMonth list invoices by month
 func (i *InvoiceModel) ByMonth(month int) ([]Invoice, error) {
 	invoices := []Invoice{}
-	stmt := `SELECT * FROM invoices WHERE month=$1;`
+	stmt := `SELECT * FROM invoices WHERE reference_month=$1;`
 	result, err := i.db.Query(stmt, month)
 	if err != nil {
 		return invoices, err
@@ -131,7 +131,7 @@ func (i *InvoiceModel) ByMonth(month int) ([]Invoice, error) {
 // ByYear list invoices by year
 func (i *InvoiceModel) ByYear(year int) ([]Invoice, error) {
 	invoices := []Invoice{}
-	stmt := `SELECT * FROM invoices WHERE year=$1;`
+	stmt := `SELECT * FROM invoices WHERE reference_year=$1;`
 	result, err := i.db.Query(stmt, year)
 	if err != nil {
 		return invoices, err

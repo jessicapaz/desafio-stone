@@ -13,18 +13,18 @@ import (
 	"github.com/jessicapaz/desafio-stone/services"
 )
 
-type CustomValidator struct {
+type customValidator struct {
 	validator *validator.Validate
 }
 
-func (cv *CustomValidator) Validate(i interface{}) error {
+func (cv *customValidator) Validate(i interface{}) error {
 	return cv.validator.Struct(i)
 }
 
 func main() {
 	// Echo instance
 	e := echo.New()
-	e.Validator = &CustomValidator{validator: validator.New()}
+	e.Validator = &customValidator{validator: validator.New()}
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -46,6 +46,7 @@ func main() {
 	r.POST("", handler.CreateInvoice)
 	r.GET("", handler.ListInvoice)
 	r.DELETE("/:id", handler.DeactivateInvoice)
+	r.GET("/:id", handler.RetrieveInvoice)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8966"))

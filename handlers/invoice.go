@@ -74,3 +74,14 @@ func (h *Handler) DeactivateInvoice(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, i)
 }
+
+// RetrieveInvoice handler
+func (h *Handler) RetrieveInvoice(c echo.Context) error {
+	id := c.Param("id")
+	idInt, _ := strconv.Atoi(id)
+	invoice, err := h.InvoiceModel.ByID(idInt)
+	if err != nil {
+		return c.String(http.StatusNotFound, "Invoice not found")
+	}
+	return c.JSON(http.StatusOK, invoice)
+}

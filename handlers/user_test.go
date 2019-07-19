@@ -1,13 +1,16 @@
 package handlers
 
 import (
-	"github.com/jessicapaz/desafio-stone/models"
-	"github.com/labstack/echo"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/go-playground/validator"
+	"github.com/labstack/echo"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/jessicapaz/desafio-stone/models"
 )
 
 type UserModel struct{}
@@ -26,9 +29,18 @@ func (u *UserModel) ByEmail(email string) (models.User, error) {
 	}, nil
 }
 
+type customValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *customValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
+
 func TestCreateUser(t *testing.T) {
 	t.Run("returns a created user", func(t *testing.T) {
 		e := echo.New()
+		e.Validator = &customValidator{validator: validator.New()}
 		userJSON := `{"email":"j@mail.com","password":"123456"}`
 		req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(userJSON))
 		req.Header.Set("Content-Type", "application/json")
@@ -46,6 +58,7 @@ func TestCreateUser(t *testing.T) {
 	})
 	t.Run("returns a 400 status code if password is empty", func(t *testing.T) {
 		e := echo.New()
+		e.Validator = &customValidator{validator: validator.New()}
 		userJSON := `{"email":"j@mail.com"}`
 		req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(userJSON))
 		req.Header.Set("Content-Type", "application/json")
@@ -55,10 +68,8 @@ func TestCreateUser(t *testing.T) {
 		u := &UserModel{}
 		h := NewHandler(u, nil, nil)
 
-		var want = `{"message":"password must not be empty"}`
 		if assert.NoError(t, h.CreateUser(c)) {
 			assert.Equal(t, http.StatusBadRequest, rec.Code)
-			assert.Equal(t, want+"\n", rec.Body.String())
 		}
 	})
 }

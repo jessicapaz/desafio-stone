@@ -42,6 +42,7 @@ func main() {
 	r.GET("", handler.ListInvoice)
 	r.DELETE("/:id", handler.DeactivateInvoice)
 	r.GET("/:id", handler.RetrieveInvoice)
+	r.PUT("/:id", handler.UpdateInvoice)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8966"))

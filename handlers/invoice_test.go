@@ -80,6 +80,11 @@ func (i InvoiceModel) Deactivate(invoice *models.Invoice) (models.Invoice, error
 	return invoice1, nil
 }
 
+func (i InvoiceModel) Update(invoice, newInvoice *models.Invoice) (models.Invoice, error) {
+	invoice2.ID = 1
+	return invoice2, nil
+}
+
 func TestCreateInvoice(t *testing.T) {
 	e := echo.New()
 	e.Validator = &CustomValidator{Validator: validator.New()}
@@ -205,6 +210,26 @@ func TestRetrieveInvoice(t *testing.T) {
 
 	want := `{"id":1,"reference_month":2,"reference_year":2017,"document":"03245665450","description":"Some notes","amount":38.9,"is_active":0,"created_at":"2019-05-02T15:04:05-07:00","deactivated_at":"2019-05-02T15:04:05-07:00"}`
 	if assert.NoError(t, h.DeactivateInvoice(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, want+"\n", rec.Body.String())
+	}
+}
+
+func TestUpdateInvoice(t *testing.T) {
+	e := echo.New()
+	e.Validator = &CustomValidator{Validator: validator.New()}
+	invoiceJSON := `{"reference_month":3,"reference_year":2018,"document":"03245665480",
+		"description":"Some notes", "amount":38.90,"is_active":1}`
+	req := httptest.NewRequest(http.MethodPut, "/invoices/1", strings.NewReader(invoiceJSON))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	i := &InvoiceModel{}
+	h := NewHandler(nil, nil, i)
+
+	want := `{"id":1,"reference_month":3,"reference_year":2018,"document":"03245665480","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00"}`
+	if assert.NoError(t, h.UpdateInvoice(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Equal(t, want+"\n", rec.Body.String())
 	}

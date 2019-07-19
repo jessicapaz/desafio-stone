@@ -32,6 +32,7 @@ type InvoiceModelImpl interface {
 	ByYear(year int) ([]Invoice, error)
 	ByID(id int) (Invoice, error)
 	Deactivate(invoice *Invoice) (Invoice, error)
+	Update(invoice, newInvoice *Invoice) (Invoice, error)
 }
 
 type InvoiceModel struct {
@@ -171,4 +172,15 @@ func (i *InvoiceModel) Deactivate(invoice *Invoice) (Invoice, error) {
 		return returnInvoice, err
 	}
 	return returnInvoice, nil
+}
+
+// Update updates a invoice on database
+func (i *InvoiceModel) Update(invoice, newInvoice *Invoice) (Invoice, error) {
+	stmt := `UPDATE invoices SET reference_month=$1, reference_year=$2, document=$3, description=$4, amount=$5 WHERE id=$6 RETURNING *;`
+	result := i.db.QueryRow(stmt, newInvoice.ReferenceMonth, newInvoice.ReferenceYear, newInvoice.Document, newInvoice.Description, newInvoice.Amount, invoice.ID)
+	err := result.Scan(&newInvoice.ID, &newInvoice.ReferenceMonth, &newInvoice.ReferenceYear, &newInvoice.Document, &newInvoice.Description, &newInvoice.Amount, &newInvoice.IsActive, &newInvoice.CreatedAt, &newInvoice.DeactivatedAt)
+	if err != nil {
+		return *newInvoice, err
+	}
+	return *newInvoice, nil
 }

@@ -85,3 +85,22 @@ func (h *Handler) RetrieveInvoice(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, invoice)
 }
+
+// UpdateInvoice handler
+func (h *Handler) UpdateInvoice(c echo.Context) error {
+	id := c.Param("id")
+	idInt, _ := strconv.Atoi(id)
+	invoice, err := h.InvoiceModel.ByID(idInt)
+	if err != nil {
+		return c.String(http.StatusNotFound, "Invoice not found")
+	}
+	newInvoice := &models.Invoice{}
+	if err := c.Bind(newInvoice); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, "Invalid request")
+	}
+	i, err := h.InvoiceModel.Update(&invoice, newInvoice)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, i)
+}

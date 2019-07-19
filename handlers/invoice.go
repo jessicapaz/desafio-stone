@@ -13,7 +13,10 @@ import (
 func (h *Handler) CreateInvoice(c echo.Context) error {
 	invoice := &models.Invoice{}
 	if err := c.Bind(invoice); err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, invoice)
+		return c.JSON(http.StatusUnprocessableEntity, "Invalid request")
+	}
+	if err := c.Validate(invoice); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	i, err := h.InvoiceModel.Create(invoice)
 	if err != nil {

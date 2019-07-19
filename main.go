@@ -13,18 +13,13 @@ import (
 	"github.com/jessicapaz/desafio-stone/services"
 )
 
-type customValidator struct {
-	validator *validator.Validate
-}
-
-func (cv *customValidator) Validate(i interface{}) error {
-	return cv.validator.Struct(i)
-}
-
 func main() {
 	// Echo instance
 	e := echo.New()
-	e.Validator = &customValidator{validator: validator.New()}
+
+	// Validator
+	e.Validator = &handlers.CustomValidator{Validator: validator.New()}
+
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())

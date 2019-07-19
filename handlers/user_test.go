@@ -29,18 +29,10 @@ func (u *UserModel) ByEmail(email string) (models.User, error) {
 	}, nil
 }
 
-type customValidator struct {
-	validator *validator.Validate
-}
-
-func (cv *customValidator) Validate(i interface{}) error {
-	return cv.validator.Struct(i)
-}
-
 func TestCreateUser(t *testing.T) {
 	t.Run("returns a created user", func(t *testing.T) {
 		e := echo.New()
-		e.Validator = &customValidator{validator: validator.New()}
+		e.Validator = &CustomValidator{Validator: validator.New()}
 		userJSON := `{"email":"j@mail.com","password":"123456"}`
 		req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(userJSON))
 		req.Header.Set("Content-Type", "application/json")
@@ -58,7 +50,7 @@ func TestCreateUser(t *testing.T) {
 	})
 	t.Run("returns a 400 status code if password is empty", func(t *testing.T) {
 		e := echo.New()
-		e.Validator = &customValidator{validator: validator.New()}
+		e.Validator = &CustomValidator{Validator: validator.New()}
 		userJSON := `{"email":"j@mail.com"}`
 		req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(userJSON))
 		req.Header.Set("Content-Type", "application/json")

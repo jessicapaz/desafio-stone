@@ -14,14 +14,6 @@ import (
 	"github.com/jessicapaz/desafio-stone/models"
 )
 
-type customValidator1 struct {
-	validator *validator.Validate
-}
-
-func (cv *customValidator1) Validate(i interface{}) error {
-	return cv.validator.Struct(i)
-}
-
 type InvoiceModel struct{}
 
 var (
@@ -90,7 +82,7 @@ func (i InvoiceModel) Deactivate(invoice *models.Invoice) (models.Invoice, error
 
 func TestCreateInvoice(t *testing.T) {
 	e := echo.New()
-	e.Validator = &customValidator{validator: validator.New()}
+	e.Validator = &CustomValidator{Validator: validator.New()}
 	invoiceJSON := `{"reference_month":2,"reference_year":2017,"document":"03245665450",
 		"description":"Some notes", "amount":38.90,"is_active":1}`
 	req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(invoiceJSON))
@@ -111,7 +103,7 @@ func TestCreateInvoice(t *testing.T) {
 func TestListInvoice(t *testing.T) {
 	t.Run("Returns all invoices", func(t *testing.T) {
 		e := echo.New()
-		e.Validator = &customValidator{validator: validator.New()}
+		e.Validator = &CustomValidator{Validator: validator.New()}
 		req := httptest.NewRequest(http.MethodGet, "/invoices", nil)
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
@@ -129,7 +121,7 @@ func TestListInvoice(t *testing.T) {
 
 	t.Run("Returns invoices of a given document", func(t *testing.T) {
 		e := echo.New()
-		e.Validator = &customValidator{validator: validator.New()}
+		e.Validator = &CustomValidator{Validator: validator.New()}
 		req := httptest.NewRequest(http.MethodGet, "/invoices?document=03245665480", nil)
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
@@ -147,7 +139,7 @@ func TestListInvoice(t *testing.T) {
 
 	t.Run("Returns invoices of a given month", func(t *testing.T) {
 		e := echo.New()
-		e.Validator = &customValidator{validator: validator.New()}
+		e.Validator = &CustomValidator{Validator: validator.New()}
 		req := httptest.NewRequest(http.MethodGet, "/invoices?month=2", nil)
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
@@ -165,7 +157,7 @@ func TestListInvoice(t *testing.T) {
 
 	t.Run("Returns invoices of a given year", func(t *testing.T) {
 		e := echo.New()
-		e.Validator = &customValidator{validator: validator.New()}
+		e.Validator = &CustomValidator{Validator: validator.New()}
 		req := httptest.NewRequest(http.MethodGet, "/invoices?year=2017", nil)
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
@@ -184,7 +176,7 @@ func TestListInvoice(t *testing.T) {
 
 func TestDeactivateInvoice(t *testing.T) {
 	e := echo.New()
-	e.Validator = &customValidator{validator: validator.New()}
+	e.Validator = &CustomValidator{Validator: validator.New()}
 	req := httptest.NewRequest(http.MethodDelete, "/invoices/1", nil)
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
@@ -202,7 +194,7 @@ func TestDeactivateInvoice(t *testing.T) {
 
 func TestRetrieveInvoice(t *testing.T) {
 	e := echo.New()
-	e.Validator = &customValidator{validator: validator.New()}
+	e.Validator = &CustomValidator{Validator: validator.New()}
 	req := httptest.NewRequest(http.MethodGet, "/invoices/1", nil)
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()

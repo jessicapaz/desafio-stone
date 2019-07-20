@@ -13,8 +13,8 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	resp := renderings.UserResponse{}
 	e := renderings.ErrorResponse{}
 	if err := c.Bind(user); err != nil {
-		resp.Message = "Unable to bind request"
-		return c.JSON(http.StatusUnprocessableEntity, resp)
+		e.Errors = []string{"Unable to bind request"}
+		return c.JSON(http.StatusUnprocessableEntity, e)
 	}
 	if err := Validate(user); len(err) != 0 {
 		e.Errors = err
@@ -22,8 +22,8 @@ func (h *Handler) CreateUser(c echo.Context) error {
 	}
 	u, err := h.UserModel.Create(user)
 	if err != nil {
-		resp.Message = "Unable to create user"
-		return c.JSON(http.StatusInternalServerError, resp)
+		e.Errors = []string{"Unable to create user"}
+		return c.JSON(http.StatusInternalServerError, e)
 	}
 	resp.ID = u.ID
 	resp.Email = u.Email

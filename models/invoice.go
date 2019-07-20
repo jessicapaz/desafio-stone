@@ -91,7 +91,7 @@ func (i *InvoiceModel) List(sort string, offset, limit int) ([]Invoice, error) {
 // ListByDocument list invoices by document
 func (i *InvoiceModel) ListByDocument(document, sort string, offset, limit int) ([]Invoice, error) {
 	invoices := []Invoice{}
-	stmt := fmt.Sprintf("SELECT * FROM invoices WHERE document=%s ORDER BY %s OFFSET %d LIMIT %d", document, sort, offset, limit)
+	stmt := fmt.Sprintf("SELECT * FROM invoices WHERE document='%s' ORDER BY %s OFFSET %d LIMIT %d", document, sort, offset, limit)
 	result, err := i.db.Query(stmt)
 	if err != nil {
 		return invoices, err
@@ -133,8 +133,8 @@ func (i *InvoiceModel) ListByMonth(month int, sort string, offset, limit int) ([
 // ListByYear list invoices by year
 func (i *InvoiceModel) ListByYear(year int, sort string, offset, limit int) ([]Invoice, error) {
 	invoices := []Invoice{}
-	stmt := fmt.Sprintf("SELECT * FROM invoices WHERE reference_month=%d ORDER BY %s OFFSET %d LIMIT %d", year, sort, offset, limit)
-	result, err := i.db.Query(stmt, year)
+	stmt := fmt.Sprintf("SELECT * FROM invoices WHERE reference_year=%d ORDER BY %s OFFSET %d LIMIT %d", year, sort, offset, limit)
+	result, err := i.db.Query(stmt)
 	if err != nil {
 		return invoices, err
 	}

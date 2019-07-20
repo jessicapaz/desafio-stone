@@ -11,12 +11,14 @@ import (
 func (h *Handler) CreateUser(c echo.Context) error {
 	user := new(models.User)
 	resp := renderings.UserResponse{}
+	e := renderings.ErrorResponse{}
 	if err := c.Bind(user); err != nil {
 		resp.Message = "Unable to bind request"
 		return c.JSON(http.StatusUnprocessableEntity, resp)
 	}
-	if err := c.Validate(user); err != nil {
-		return c.JSON(http.StatusBadRequest, err.Error())
+	if err := Validate(user); len(err) != 0 {
+		e.Errors = err
+		return c.JSON(http.StatusBadRequest, e)
 	}
 	u, err := h.UserModel.Create(user)
 	if err != nil {

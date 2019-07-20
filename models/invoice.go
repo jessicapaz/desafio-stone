@@ -15,9 +15,9 @@ type Invoice struct {
 	ID             int        `json:"id"`
 	ReferenceMonth int        `json:"reference_month" validate:"required,min=1,max=12"`
 	ReferenceYear  int        `json:"reference_year" validate:"required,min=1900,max=2030"`
-	Document       string     `json:"document" validate:"required,len=11|len=14"`
+	Document       string     `json:"document" validate:"required,document"`
 	Description    string     `json:"description" validate:"required"`
-	Amount         float64    `json:"amount" validate:"required,gt=0"`
+	Amount         float64    `json:"amount"`
 	IsActive       int        `json:"is_active"`
 	CreatedAt      time.Time  `json:"created_at"`
 	DeactivatedAt  *time.Time `json:"deactivated_at,omitempty"`

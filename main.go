@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 
-	"github.com/go-playground/validator"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
@@ -16,9 +15,6 @@ import (
 func main() {
 	// Echo instance
 	e := echo.New()
-
-	// Validator
-	e.Validator = &handlers.CustomValidator{Validator: validator.New()}
 
 	// Middleware
 	e.Use(middleware.Logger())

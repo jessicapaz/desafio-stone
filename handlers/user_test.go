@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-playground/validator"
 	"github.com/labstack/echo"
 	"github.com/stretchr/testify/assert"
 
@@ -32,7 +31,6 @@ func (u *UserModel) ByEmail(email string) (models.User, error) {
 func TestCreateUser(t *testing.T) {
 	t.Run("returns a created user", func(t *testing.T) {
 		e := echo.New()
-		e.Validator = &CustomValidator{Validator: validator.New()}
 		userJSON := `{"email":"j@mail.com","password":"123456"}`
 		req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(userJSON))
 		req.Header.Set("Content-Type", "application/json")
@@ -50,7 +48,6 @@ func TestCreateUser(t *testing.T) {
 	})
 	t.Run("returns a 400 status code if password is empty", func(t *testing.T) {
 		e := echo.New()
-		e.Validator = &CustomValidator{Validator: validator.New()}
 		userJSON := `{"email":"j@mail.com"}`
 		req := httptest.NewRequest(http.MethodPost, "/users", strings.NewReader(userJSON))
 		req.Header.Set("Content-Type", "application/json")

@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 )
 
@@ -26,10 +27,10 @@ type Invoice struct {
 // InvoiceModelImpl describes all methods of a InvoiceModel
 type InvoiceModelImpl interface {
 	Create(i *Invoice) (Invoice, error)
-	List() ([]Invoice, error)
-	ByDocument(document string) ([]Invoice, error)
-	ByMonth(month int) ([]Invoice, error)
-	ByYear(year int) ([]Invoice, error)
+	List(sort string, offset, limit int) ([]Invoice, error)
+	ListByDocument(document, sort string, offset, limit int) ([]Invoice, error)
+	ListByMonth(month int, sort string, offset, limit int) ([]Invoice, error)
+	ListByYear(year int, sort string, offset, limit int) ([]Invoice, error)
 	ByID(id int) (Invoice, error)
 	Deactivate(invoice *Invoice) (Invoice, error)
 	Update(invoice, newInvoice *Invoice) (Invoice, error)
@@ -67,9 +68,9 @@ func (i *InvoiceModel) Create(invoice *Invoice) (Invoice, error) {
 }
 
 // List list all invoices
-func (i *InvoiceModel) List() ([]Invoice, error) {
+func (i *InvoiceModel) List(sort string, offset, limit int) ([]Invoice, error) {
 	invoices := []Invoice{}
-	stmt := `SELECT * FROM invoices;`
+	stmt := fmt.Sprintf("SELECT * FROM invoices ORDER BY %s OFFSET %d LIMIT %d", sort, offset, limit)
 	result, err := i.db.Query(stmt)
 	if err != nil {
 		return invoices, err
@@ -87,11 +88,11 @@ func (i *InvoiceModel) List() ([]Invoice, error) {
 	return invoices, nil
 }
 
-// ByDocument list invoices by document
-func (i *InvoiceModel) ByDocument(document string) ([]Invoice, error) {
+// ListByDocument list invoices by document
+func (i *InvoiceModel) ListByDocument(document, sort string, offset, limit int) ([]Invoice, error) {
 	invoices := []Invoice{}
-	stmt := `SELECT * FROM invoices WHERE document=$1;`
-	result, err := i.db.Query(stmt, document)
+	stmt := fmt.Sprintf("SELECT * FROM invoices WHERE document=%s ORDER BY %s OFFSET %d LIMIT %d", document, sort, offset, limit)
+	result, err := i.db.Query(stmt)
 	if err != nil {
 		return invoices, err
 	}
@@ -108,11 +109,11 @@ func (i *InvoiceModel) ByDocument(document string) ([]Invoice, error) {
 	return invoices, nil
 }
 
-// ByMonth list invoices by month
-func (i *InvoiceModel) ByMonth(month int) ([]Invoice, error) {
+// ListByMonth list invoices by month
+func (i *InvoiceModel) ListByMonth(month int, sort string, offset, limit int) ([]Invoice, error) {
 	invoices := []Invoice{}
-	stmt := `SELECT * FROM invoices WHERE reference_month=$1;`
-	result, err := i.db.Query(stmt, month)
+	stmt := fmt.Sprintf("SELECT * FROM invoices WHERE reference_month=%d ORDER BY %s OFFSET %d LIMIT %d", month, sort, offset, limit)
+	result, err := i.db.Query(stmt)
 	if err != nil {
 		return invoices, err
 	}
@@ -129,10 +130,10 @@ func (i *InvoiceModel) ByMonth(month int) ([]Invoice, error) {
 	return invoices, nil
 }
 
-// ByYear list invoices by year
-func (i *InvoiceModel) ByYear(year int) ([]Invoice, error) {
+// ListByYear list invoices by year
+func (i *InvoiceModel) ListByYear(year int, sort string, offset, limit int) ([]Invoice, error) {
 	invoices := []Invoice{}
-	stmt := `SELECT * FROM invoices WHERE reference_year=$1;`
+	stmt := fmt.Sprintf("SELECT * FROM invoices WHERE reference_month=%d ORDER BY %s OFFSET %d LIMIT %d", year, sort, offset, limit)
 	result, err := i.db.Query(stmt, year)
 	if err != nil {
 		return invoices, err
@@ -150,7 +151,7 @@ func (i *InvoiceModel) ByYear(year int) ([]Invoice, error) {
 	return invoices, nil
 }
 
-// ByID get an invoices by id
+// ByID get an invoice by id
 func (i *InvoiceModel) ByID(id int) (Invoice, error) {
 	invoice := Invoice{}
 	stmt := `SELECT * FROM invoices WHERE id=$1;`

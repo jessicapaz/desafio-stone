@@ -32,7 +32,16 @@ func (h *Handler) CreateInvoice(c echo.Context) error {
 
 // ListInvoice handler
 func (h *Handler) ListInvoice(c echo.Context) error {
-	i, err := h.InvoiceModel.List()
+	sort := c.QueryParam("sort")
+	if err := ValidateSortQueryParam(sort); err != nil {
+		sort = "id"
+	}
+	offset, _ := strconv.Atoi(c.QueryParam("offset"))
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+	if limit == 0 {
+		limit = 10
+	}
+	i, err := h.InvoiceModel.List(sort, offset, limit)
 	e := renderings.ErrorResponse{}
 	if err != nil {
 		e.Errors = []string{err.Error()}
@@ -40,25 +49,25 @@ func (h *Handler) ListInvoice(c echo.Context) error {
 	}
 	document := c.QueryParam("document")
 	if document != "" {
-		i, err := h.InvoiceModel.ByDocument(document)
+		i, err := h.InvoiceModel.ListByDocument(document, sort, offset, limit)
 		if err != nil {
 			e.Errors = []string{err.Error()}
 			return c.JSON(http.StatusInternalServerError, e)
 		}
 		return c.JSON(http.StatusOK, i)
 	}
-	month, _ := strconv.Atoi(c.QueryParam("month"))
+	month, _ := strconv.Atoi(c.QueryParam("reference_month"))
 	if month != 0 {
-		i, err := h.InvoiceModel.ByMonth(month)
+		i, err := h.InvoiceModel.ListByMonth(month, sort, offset, limit)
 		if err != nil {
 			e.Errors = []string{err.Error()}
 			return c.JSON(http.StatusInternalServerError, e)
 		}
 		return c.JSON(http.StatusOK, i)
 	}
-	year, _ := strconv.Atoi(c.QueryParam("year"))
+	year, _ := strconv.Atoi(c.QueryParam("reference_year"))
 	if year != 0 {
-		i, err := h.InvoiceModel.ByYear(year)
+		i, err := h.InvoiceModel.ListByYear(year, sort, offset, limit)
 		if err != nil {
 			e.Errors = []string{err.Error()}
 			return c.JSON(http.StatusInternalServerError, e)

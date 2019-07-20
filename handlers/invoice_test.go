@@ -43,25 +43,25 @@ func (i InvoiceModel) Create(invoice *models.Invoice) (models.Invoice, error) {
 	return invoice1, nil
 }
 
-func (i InvoiceModel) List() ([]models.Invoice, error) {
+func (i InvoiceModel) List(sort string, offset, limit int) ([]models.Invoice, error) {
 	return []models.Invoice{invoice1, invoice2}, nil
 }
 
-func (i InvoiceModel) ByDocument(document string) ([]models.Invoice, error) {
+func (i InvoiceModel) ListByDocument(document, sort string, offset, limit int) ([]models.Invoice, error) {
 	if document == "03245665450" {
 		return []models.Invoice{invoice1}, nil
 	}
 	return []models.Invoice{invoice2}, nil
 }
 
-func (i InvoiceModel) ByMonth(month int) ([]models.Invoice, error) {
+func (i InvoiceModel) ListByMonth(month int, sort string, offset, limit int) ([]models.Invoice, error) {
 	if month == 2 {
 		return []models.Invoice{invoice1}, nil
 	}
 	return []models.Invoice{invoice2}, nil
 }
 
-func (i InvoiceModel) ByYear(year int) ([]models.Invoice, error) {
+func (i InvoiceModel) ListByYear(year int, sort string, offset, limit int) ([]models.Invoice, error) {
 	if year == 2017 {
 		return []models.Invoice{invoice1}, nil
 	}
@@ -140,7 +140,7 @@ func TestListInvoice(t *testing.T) {
 
 	t.Run("Returns invoices of a given month", func(t *testing.T) {
 		e := echo.New()
-		req := httptest.NewRequest(http.MethodGet, "/invoices?month=2", nil)
+		req := httptest.NewRequest(http.MethodGet, "/invoices?reference_month=2", nil)
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
@@ -157,7 +157,7 @@ func TestListInvoice(t *testing.T) {
 
 	t.Run("Returns invoices of a given year", func(t *testing.T) {
 		e := echo.New()
-		req := httptest.NewRequest(http.MethodGet, "/invoices?year=2017", nil)
+		req := httptest.NewRequest(http.MethodGet, "/invoices?reference_year=2017", nil)
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)

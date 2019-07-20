@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/go-playground/validator"
 )
 
@@ -25,4 +28,34 @@ func Validate(i interface{}) []string {
 		}
 	}
 	return e
+}
+
+func ValidateSortQueryParam(s string) error {
+	if s == "" {
+		return errors.New("Empty")
+	}
+	sortList := strings.Split(s, ",")
+	for _, v := range sortList {
+		sort := strings.Split(v, " ")
+		options := []string{"document", "reference_year", "reference_month"}
+		if stringInSlice(sort[0], options) == false {
+			return errors.New("Not a valid option")
+		}
+		options = []string{"desc", "asc"}
+		if len(sort) == 2 {
+			if stringInSlice(sort[1], options) == false {
+				return errors.New("Not a valid option")
+			}
+		}
+	}
+	return nil
+}
+
+func stringInSlice(s string, list []string) bool {
+	for _, v := range list {
+		if v == strings.TrimSpace(s) {
+			return true
+		}
+	}
+	return false
 }

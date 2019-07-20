@@ -24,7 +24,7 @@ type Invoice struct {
 	DeactivatedAt  *time.Time `json:"deactivated_at,omitempty"`
 }
 
-// InvoiceModelImpl describes all methods of a InvoiceModel
+// InvoiceModelImpl describes all methods that a InvoiceModel must have
 type InvoiceModelImpl interface {
 	Create(i *Invoice) (Invoice, error)
 	List(sort string, offset, limit int) ([]Invoice, error)

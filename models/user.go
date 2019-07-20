@@ -12,7 +12,7 @@ type User struct {
 	Password string `json:"password" validate:"required,gte=6"`
 }
 
-// UserModelImpl describes all methods of a UserModelImpl
+// UserModelImpl describes all methods that a UserModel must have
 type UserModelImpl interface {
 	Create(user *User) (User, error)
 	ByEmail(email string) (User, error)

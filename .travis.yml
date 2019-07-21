@@ -1,0 +1,11 @@
+language: go
+sudo: false
+env:
+- GO111MODULE=on
+deploy:
+  provider: heroku
+  api_key:
+    secure: Hu2qJ6KT2RxH6v/EIsi5QBVUTRRUtEEXp9hBmFwrnlovtdNsQwIqGUCS/A5KDWh27cKE11Gg8JinNy6ykpUW2SC9nedDQV6+JME1pDunWg0yt7rWNuw4Z+d8RY/Aax0yASN0I7vyFQokLthv38gZBTdtwJ8jaejktJ8Gld/DvtMK2YsQzZm7JHKIh4b4XDug6PFJaP5fdAdkPbQaa05p16Mf7zBV1NZEDPJdeAJCVDGyA5Erbg5T+XG3mwHiVHmTRfoYgKGUhWQMWUIrKdBvXRjS0bb6fV04Ab8D40bTeo1AYHckatxu9XWFqRfrmuKYBXTU7+g+Pm84M59bq3Dy2iwbGvmWuiSlkKCpR8y0heWaBBGf1oUbv+xc2FZvqhVB9r7wrbgw0SHVle5NoF1fz5GwY0loYIa62VKNuCEgHEzNQyFnDM4AmO7vC21+Wh5hWOdJRT05VE8yxRHBrQNAZkFDJfuA+/jfg7PD7QiczM4zd2jqdSRhIQwsUj6Ob9nAjoZs9M0BJ7vHU8yXRFvFkvYPLrc7R+2CYVhYSN1YAhjLkjLYtAlTxHwLzkwk7rt1ufrkavpqgirrDxWfmYGMaaXMB+fu4J0/IFQDIvcmYk2ybGH/iDAg4Mh5fCRUDn4bV4j1+SBFhhVtgi5xqoOEjfzGjgAzx3x8yCfCkGRYzWE=
+  app: desafio-stone-1
+  on:
+    repo: jessicapaz/desafio-stone

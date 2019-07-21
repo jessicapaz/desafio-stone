@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
+	"reflect"
 	"time"
 )
 
@@ -14,11 +15,11 @@ const (
 // Invoice model
 type Invoice struct {
 	ID             int        `json:"id"`
-	ReferenceMonth int        `json:"reference_month" validate:"required,min=1,max=12"`
-	ReferenceYear  int        `json:"reference_year" validate:"required,min=1900,max=2030"`
-	Document       string     `json:"document" validate:"required,document"`
-	Description    string     `json:"description" validate:"required"`
-	Amount         float64    `json:"amount"`
+	ReferenceMonth int        `json:"reference_month" validate:"required,min=1,max=12" sql:"reference_month"`
+	ReferenceYear  int        `json:"reference_year" validate:"required,min=1900,max=2030" sql:"reference_year"`
+	Document       string     `json:"document" validate:"required,document" sql:"document"`
+	Description    string     `json:"description" validate:"required" sql:"description"`
+	Amount         float64    `json:"amount" sql:"amount"`
 	IsActive       int        `json:"is_active"`
 	CreatedAt      time.Time  `json:"created_at"`
 	DeactivatedAt  *time.Time `json:"deactivated_at,omitempty"`
@@ -34,6 +35,7 @@ type InvoiceModelImpl interface {
 	ByID(id int) (Invoice, error)
 	Deactivate(invoice *Invoice) (Invoice, error)
 	Update(invoice, newInvoice *Invoice) (Invoice, error)
+	PartialUpdate(invoice, newInvoice *Invoice) (Invoice, error)
 }
 
 type InvoiceModel struct {
@@ -184,4 +186,27 @@ func (i *InvoiceModel) Update(invoice, newInvoice *Invoice) (Invoice, error) {
 		return *newInvoice, err
 	}
 	return *newInvoice, nil
+}
+
+// PartialUpdate updates a invoice on database
+func (i *InvoiceModel) PartialUpdate(invoice, newInvoice *Invoice) (Invoice, error) {
+	it := reflect.TypeOf(*newInvoice)
+	rv := reflect.ValueOf(*newInvoice)
+
+	for j := 0; j < rv.NumField(); j++ {
+		if !isEmpty(rv.Field(j).Interface()) {
+			sqlField := it.Field(j).Tag.Get("sql")
+			stmt := fmt.Sprintf("UPDATE invoices SET %s=$1 WHERE id=%d", sqlField, invoice.ID)
+			_, err := i.db.Query(stmt, rv.Field(j).Interface())
+			if err != nil {
+				return *invoice, err
+			}
+
+		}
+	}
+	return i.ByID(invoice.ID)
+}
+
+func isEmpty(i interface{}) bool {
+	return reflect.Zero(reflect.TypeOf(i)).Interface() == i
 }

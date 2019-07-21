@@ -127,3 +127,25 @@ func (h *Handler) UpdateInvoice(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, i)
 }
+
+// PartialUpdateInvoice handler
+func (h *Handler) PartialUpdateInvoice(c echo.Context) error {
+	e := renderings.ErrorResponse{}
+	id, _ := strconv.Atoi(c.Param("id"))
+	invoice, err := h.InvoiceModel.ByID(id)
+	if err != nil {
+		e.Errors = []string{"Invoice not found"}
+		return c.JSON(http.StatusNotFound, e)
+	}
+	newInvoice := &models.Invoice{}
+	if err := c.Bind(newInvoice); err != nil {
+		e.Errors = []string{"Invalid request"}
+		return c.JSON(http.StatusUnprocessableEntity, e)
+	}
+	i, err := h.InvoiceModel.PartialUpdate(&invoice, newInvoice)
+	if err != nil {
+		e.Errors = []string{err.Error()}
+		return c.JSON(http.StatusInternalServerError, e)
+	}
+	return c.JSON(http.StatusOK, i)
+}

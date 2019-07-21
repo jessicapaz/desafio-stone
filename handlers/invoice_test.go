@@ -84,6 +84,20 @@ func (i InvoiceModel) Update(invoice, newInvoice *models.Invoice) (models.Invoic
 	return invoice2, nil
 }
 
+func (i InvoiceModel) PartialUpdate(invoice, newInvoice *models.Invoice) (models.Invoice, error) {
+	invoice3 := models.Invoice{
+		ID:             1,
+		ReferenceMonth: 6,
+		ReferenceYear:  2010,
+		Document:       "03245665450",
+		Description:    "Some notes",
+		Amount:         38.90,
+		IsActive:       1,
+		CreatedAt:      datetime,
+	}
+	return invoice3, nil
+}
+
 func TestCreateInvoice(t *testing.T) {
 	e := echo.New()
 	invoiceJSON := `{"reference_month":2,"reference_year":2017,"document":"03245665450",
@@ -221,6 +235,24 @@ func TestUpdateInvoice(t *testing.T) {
 
 	want := `{"id":1,"reference_month":3,"reference_year":2018,"document":"03245665480","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00"}`
 	if assert.NoError(t, h.UpdateInvoice(c)) {
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, want+"\n", rec.Body.String())
+	}
+}
+
+func TestPartialUpdateInvoice(t *testing.T) {
+	e := echo.New()
+	invoiceJSON := `{"reference_month":6,"reference_year":2010}`
+	req := httptest.NewRequest(http.MethodPut, "/invoices/1", strings.NewReader(invoiceJSON))
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	i := &InvoiceModel{}
+	h := NewHandler(nil, nil, i)
+
+	want := `{"id":1,"reference_month":6,"reference_year":2010,"document":"03245665450","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00"}`
+	if assert.NoError(t, h.PartialUpdateInvoice(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Equal(t, want+"\n", rec.Body.String())
 	}

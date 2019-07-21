@@ -39,6 +39,7 @@ func main() {
 	r.DELETE("/:id", handler.DeactivateInvoice)
 	r.GET("/:id", handler.RetrieveInvoice)
 	r.PUT("/:id", handler.UpdateInvoice)
+	r.PATCH("/:id", handler.PartialUpdateInvoice)
 
 	// Start server
 	port := os.Getenv("PORT")

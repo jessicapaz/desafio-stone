@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"database/sql"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
@@ -9,7 +10,7 @@ import (
 var db *sql.DB
 
 func init() {
-	dbInfo := "postgresql://postgres:postgres@db:5432/postgres?sslmode=disable"
+	dbInfo := os.Getenv("DATABASE_URL")
 	conn, err := sql.Open("postgres", dbInfo)
 	if err != nil {
 		log.WithFields(log.Fields{

@@ -201,7 +201,7 @@ func TestRetrieveInvoice(t *testing.T) {
 	h := NewHandler(nil, nil, i)
 
 	want := `{"id":1,"reference_month":2,"reference_year":2017,"document":"03245665450","description":"Some notes","amount":38.9,"is_active":0,"created_at":"2019-05-02T15:04:05-07:00","deactivated_at":"2019-05-02T15:04:05-07:00"}`
-	if assert.NoError(t, h.DeactivateInvoice(c)) {
+	if assert.NoError(t, h.RetrieveInvoice(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Equal(t, want+"\n", rec.Body.String())
 	}

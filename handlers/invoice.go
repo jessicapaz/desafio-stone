@@ -80,9 +80,8 @@ func (h *Handler) ListInvoice(c echo.Context) error {
 // DeactivateInvoice handler
 func (h *Handler) DeactivateInvoice(c echo.Context) error {
 	e := renderings.ErrorResponse{}
-	id := c.Param("id")
-	idInt, _ := strconv.Atoi(id)
-	invoice, err := h.InvoiceModel.ByID(idInt)
+	id, _ := strconv.Atoi(c.Param("id"))
+	invoice, err := h.InvoiceModel.ByID(id)
 	if err != nil {
 		e.Errors = []string{"Invoice not found"}
 		return c.JSON(http.StatusNotFound, e)
@@ -98,9 +97,8 @@ func (h *Handler) DeactivateInvoice(c echo.Context) error {
 // RetrieveInvoice handler
 func (h *Handler) RetrieveInvoice(c echo.Context) error {
 	e := renderings.ErrorResponse{}
-	id := c.Param("id")
-	idInt, _ := strconv.Atoi(id)
-	invoice, err := h.InvoiceModel.ByID(idInt)
+	id, _ := strconv.Atoi(c.Param("id"))
+	invoice, err := h.InvoiceModel.ByID(id)
 	if err != nil {
 		e.Errors = []string{"Invoice not found"}
 		return c.JSON(http.StatusNotFound, e)
@@ -111,9 +109,8 @@ func (h *Handler) RetrieveInvoice(c echo.Context) error {
 // UpdateInvoice handler
 func (h *Handler) UpdateInvoice(c echo.Context) error {
 	e := renderings.ErrorResponse{}
-	id := c.Param("id")
-	idInt, _ := strconv.Atoi(id)
-	invoice, err := h.InvoiceModel.ByID(idInt)
+	id, _ := strconv.Atoi(c.Param("id"))
+	invoice, err := h.InvoiceModel.ByID(id)
 	if err != nil {
 		e.Errors = []string{"Invoice not found"}
 		return c.JSON(http.StatusNotFound, e)

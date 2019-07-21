@@ -11,9 +11,10 @@ import (
 func (h *Handler) Login(c echo.Context) error {
 	user := new(models.User)
 	resp := renderings.LoginResponse{}
+	e := renderings.ErrorResponse{}
 	if err := c.Bind(user); err != nil {
-		resp.Message = "Unable to bind request"
-		return c.JSON(http.StatusUnprocessableEntity, resp)
+		e.Errors = []string{"Unable to bind request"}
+		return c.JSON(http.StatusUnprocessableEntity, e)
 	}
 	token, err := h.LoginService.Login(user)
 	if err != nil {

@@ -120,6 +120,10 @@ func (h *Handler) UpdateInvoice(c echo.Context) error {
 		e.Errors = []string{"Invalid request"}
 		return c.JSON(http.StatusUnprocessableEntity, e)
 	}
+	if err := Validate(newInvoice); len(err) != 0 {
+		e.Errors = err
+		return c.JSON(http.StatusBadRequest, e)
+	}
 	i, err := h.InvoiceModel.Update(&invoice, newInvoice)
 	if err != nil {
 		e.Errors = []string{err.Error()}

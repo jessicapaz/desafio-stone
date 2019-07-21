@@ -41,5 +41,6 @@ func main() {
 	r.PUT("/:id", handler.UpdateInvoice)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":8966"))
+	port := os.Getenv("PORT")
+	e.Logger.Fatal(e.Start(":" + port))
 }

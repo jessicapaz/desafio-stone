@@ -1,10 +1,10 @@
 package config
 
 import (
-	"os"
 	"database/sql"
 	_ "github.com/lib/pq"
 	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 var db *sql.DB

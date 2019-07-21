@@ -63,3 +63,12 @@ func TestValidate(t *testing.T) {
 		}
 	})
 }
+
+func TestValidateSortQueryParam(t *testing.T) {
+	got := ValidateSortQueryParam("document banana")
+	want := "Not a valid option"
+
+	if got.Error() != want {
+		t.Errorf("got %s want %s", got, want)
+	}
+}

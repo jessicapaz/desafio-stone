@@ -243,7 +243,7 @@ func TestUpdateInvoice(t *testing.T) {
 func TestPartialUpdateInvoice(t *testing.T) {
 	e := echo.New()
 	invoiceJSON := `{"reference_month":6,"reference_year":2010}`
-	req := httptest.NewRequest(http.MethodPut, "/invoices/1", strings.NewReader(invoiceJSON))
+	req := httptest.NewRequest(http.MethodPatch, "/invoices/1", strings.NewReader(invoiceJSON))
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)

@@ -73,6 +73,7 @@ func (i InvoiceModel) ByID(id int) (models.Invoice, error) {
 }
 
 func (i InvoiceModel) Deactivate(invoice *models.Invoice) (models.Invoice, error) {
+
 	datetime, _ = time.Parse("2006-01-02T15:04:05-070", "2019-05-02T15:04:05-070")
 	invoice1.IsActive = 0
 	invoice1.DeactivatedAt = &datetime
@@ -99,22 +100,41 @@ func (i InvoiceModel) PartialUpdate(invoice, newInvoice *models.Invoice) (models
 }
 
 func TestCreateInvoice(t *testing.T) {
-	e := echo.New()
-	invoiceJSON := `{"reference_month":2,"reference_year":2017,"document":"03245665450",
+	t.Run("returns a created invoice", func(t *testing.T) {
+		e := echo.New()
+		invoiceJSON := `{"reference_month":2,"reference_year":2017,"document":"03245665450",
 		"description":"Some notes", "amount":38.90,"is_active":1}`
-	req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(invoiceJSON))
-	req.Header.Set("Content-Type", "application/json")
-	rec := httptest.NewRecorder()
-	c := e.NewContext(req, rec)
+		req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(invoiceJSON))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
 
-	i := &InvoiceModel{}
-	h := NewHandler(nil, nil, i)
+		i := &InvoiceModel{}
+		h := NewHandler(nil, nil, i)
 
-	want := `{"id":1,"reference_month":2,"reference_year":2017,"document":"03245665450","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00"}`
-	if assert.NoError(t, h.CreateInvoice(c)) {
-		assert.Equal(t, http.StatusCreated, rec.Code)
-		assert.Equal(t, want+"\n", rec.Body.String())
-	}
+		want := `{"id":1,"reference_month":2,"reference_year":2017,"document":"03245665450","description":"Some notes","amount":38.9,"is_active":1,"created_at":"2019-05-02T15:04:05-07:00"}`
+		if assert.NoError(t, h.CreateInvoice(c)) {
+			assert.Equal(t, http.StatusCreated, rec.Code)
+			assert.Equal(t, want+"\n", rec.Body.String())
+		}
+	})
+	t.Run("returns an error list", func(t *testing.T) {
+		e := echo.New()
+		invoiceJSON := `{"reference_month":-1,"reference_year":2017,"document":"03245665450","amount":38.90}`
+		req := httptest.NewRequest(http.MethodPost, "/invoices", strings.NewReader(invoiceJSON))
+		req.Header.Set("Content-Type", "application/json")
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		i := &InvoiceModel{}
+		h := NewHandler(nil, nil, i)
+
+		want := `{"errors":["ReferenceMonth: must be greater than or equal to 1","Description: is required"]}`
+		if assert.NoError(t, h.CreateInvoice(c)) {
+			assert.Equal(t, http.StatusBadRequest, rec.Code)
+			assert.Equal(t, want+"\n", rec.Body.String())
+		}
+	})
 }
 
 func TestListInvoice(t *testing.T) {

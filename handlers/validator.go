@@ -24,6 +24,11 @@ func Validate(i interface{}) []string {
 				e = append(e, err.Field()+": must be less than or equal to "+err.Param())
 			case "document":
 				e = append(e, err.Field()+": must be equal to "+err.Param())
+			case "email":
+				e = append(e, err.Field()+": must be a valid email")
+			case "gte":
+				e = append(e, err.Field()+": must be greater than or equal to "+err.Param())
+
 			}
 		}
 	}

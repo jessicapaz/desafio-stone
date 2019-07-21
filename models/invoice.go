@@ -50,7 +50,7 @@ func NewInvoiceModel(db *sql.DB) *InvoiceModel {
 }
 
 // Create creates a invoice on database
-func (i *InvoiceModel) Create(invoice *Invoice) (Invoice, error) {
+func (im *InvoiceModel) Create(invoice *Invoice) (Invoice, error) {
 	newInvoice := Invoice{}
 	stmt := `INSERT INTO invoices (
 		reference_month,
@@ -61,7 +61,7 @@ func (i *InvoiceModel) Create(invoice *Invoice) (Invoice, error) {
 		is_active,
 		created_at
     ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;`
-	result := i.db.QueryRow(stmt, invoice.ReferenceMonth, invoice.ReferenceYear, invoice.Document, invoice.Description, invoice.Amount, active, time.Now())
+	result := im.db.QueryRow(stmt, invoice.ReferenceMonth, invoice.ReferenceYear, invoice.Document, invoice.Description, invoice.Amount, active, time.Now())
 	err := result.Scan(&newInvoice.ID, &newInvoice.ReferenceMonth, &newInvoice.ReferenceYear, &newInvoice.Document, &newInvoice.Description, &newInvoice.Amount, &newInvoice.IsActive, &newInvoice.CreatedAt, &newInvoice.DeactivatedAt)
 	if err != nil {
 		return newInvoice, err
@@ -70,10 +70,10 @@ func (i *InvoiceModel) Create(invoice *Invoice) (Invoice, error) {
 }
 
 // List list all invoices
-func (i *InvoiceModel) List(sort string, offset, limit int) ([]Invoice, error) {
+func (im *InvoiceModel) List(sort string, offset, limit int) ([]Invoice, error) {
 	invoices := []Invoice{}
 	stmt := fmt.Sprintf("SELECT * FROM invoices ORDER BY %s OFFSET %d LIMIT %d", sort, offset, limit)
-	result, err := i.db.Query(stmt)
+	result, err := im.db.Query(stmt)
 	if err != nil {
 		return invoices, err
 	}
@@ -91,10 +91,10 @@ func (i *InvoiceModel) List(sort string, offset, limit int) ([]Invoice, error) {
 }
 
 // ListByDocument list invoices by document
-func (i *InvoiceModel) ListByDocument(document, sort string, offset, limit int) ([]Invoice, error) {
+func (im *InvoiceModel) ListByDocument(document, sort string, offset, limit int) ([]Invoice, error) {
 	invoices := []Invoice{}
 	stmt := fmt.Sprintf("SELECT * FROM invoices WHERE document='%s' ORDER BY %s OFFSET %d LIMIT %d", document, sort, offset, limit)
-	result, err := i.db.Query(stmt)
+	result, err := im.db.Query(stmt)
 	if err != nil {
 		return invoices, err
 	}
@@ -112,10 +112,10 @@ func (i *InvoiceModel) ListByDocument(document, sort string, offset, limit int) 
 }
 
 // ListByMonth list invoices by month
-func (i *InvoiceModel) ListByMonth(month int, sort string, offset, limit int) ([]Invoice, error) {
+func (im *InvoiceModel) ListByMonth(month int, sort string, offset, limit int) ([]Invoice, error) {
 	invoices := []Invoice{}
 	stmt := fmt.Sprintf("SELECT * FROM invoices WHERE reference_month=%d ORDER BY %s OFFSET %d LIMIT %d", month, sort, offset, limit)
-	result, err := i.db.Query(stmt)
+	result, err := im.db.Query(stmt)
 	if err != nil {
 		return invoices, err
 	}
@@ -133,10 +133,10 @@ func (i *InvoiceModel) ListByMonth(month int, sort string, offset, limit int) ([
 }
 
 // ListByYear list invoices by year
-func (i *InvoiceModel) ListByYear(year int, sort string, offset, limit int) ([]Invoice, error) {
+func (im *InvoiceModel) ListByYear(year int, sort string, offset, limit int) ([]Invoice, error) {
 	invoices := []Invoice{}
 	stmt := fmt.Sprintf("SELECT * FROM invoices WHERE reference_year=%d ORDER BY %s OFFSET %d LIMIT %d", year, sort, offset, limit)
-	result, err := i.db.Query(stmt)
+	result, err := im.db.Query(stmt)
 	if err != nil {
 		return invoices, err
 	}
@@ -154,10 +154,10 @@ func (i *InvoiceModel) ListByYear(year int, sort string, offset, limit int) ([]I
 }
 
 // ByID get an invoice by id
-func (i *InvoiceModel) ByID(id int) (Invoice, error) {
+func (im *InvoiceModel) ByID(id int) (Invoice, error) {
 	invoice := Invoice{}
 	stmt := `SELECT * FROM invoices WHERE id=$1;`
-	result := i.db.QueryRow(stmt, id)
+	result := im.db.QueryRow(stmt, id)
 	err := result.Scan(&invoice.ID, &invoice.ReferenceMonth, &invoice.ReferenceYear, &invoice.Document, &invoice.Description, &invoice.Amount, &invoice.IsActive, &invoice.CreatedAt, &invoice.DeactivatedAt)
 	if err != nil {
 		return invoice, err
@@ -166,10 +166,10 @@ func (i *InvoiceModel) ByID(id int) (Invoice, error) {
 }
 
 // Deactivate change invoice status from activated to deactivated
-func (i *InvoiceModel) Deactivate(invoice *Invoice) (Invoice, error) {
+func (im *InvoiceModel) Deactivate(invoice *Invoice) (Invoice, error) {
 	returnInvoice := Invoice{}
 	stmt := `UPDATE invoices SET is_active=$1, deactivated_at=$2 WHERE id=$3 RETURNING *;`
-	result := i.db.QueryRow(stmt, deactivated, time.Now(), invoice.ID)
+	result := im.db.QueryRow(stmt, deactivated, time.Now(), invoice.ID)
 	err := result.Scan(&returnInvoice.ID, &returnInvoice.ReferenceMonth, &returnInvoice.ReferenceYear, &returnInvoice.Document, &returnInvoice.Description, &returnInvoice.Amount, &returnInvoice.IsActive, &returnInvoice.CreatedAt, &returnInvoice.DeactivatedAt)
 	if err != nil {
 		return returnInvoice, err
@@ -178,9 +178,9 @@ func (i *InvoiceModel) Deactivate(invoice *Invoice) (Invoice, error) {
 }
 
 // Update updates a invoice on database
-func (i *InvoiceModel) Update(invoice, newInvoice *Invoice) (Invoice, error) {
+func (im *InvoiceModel) Update(invoice, newInvoice *Invoice) (Invoice, error) {
 	stmt := `UPDATE invoices SET reference_month=$1, reference_year=$2, document=$3, description=$4, amount=$5 WHERE id=$6 RETURNING *;`
-	result := i.db.QueryRow(stmt, newInvoice.ReferenceMonth, newInvoice.ReferenceYear, newInvoice.Document, newInvoice.Description, newInvoice.Amount, invoice.ID)
+	result := im.db.QueryRow(stmt, newInvoice.ReferenceMonth, newInvoice.ReferenceYear, newInvoice.Document, newInvoice.Description, newInvoice.Amount, invoice.ID)
 	err := result.Scan(&newInvoice.ID, &newInvoice.ReferenceMonth, &newInvoice.ReferenceYear, &newInvoice.Document, &newInvoice.Description, &newInvoice.Amount, &newInvoice.IsActive, &newInvoice.CreatedAt, &newInvoice.DeactivatedAt)
 	if err != nil {
 		return *newInvoice, err
@@ -189,22 +189,22 @@ func (i *InvoiceModel) Update(invoice, newInvoice *Invoice) (Invoice, error) {
 }
 
 // PartialUpdate updates a invoice on database
-func (i *InvoiceModel) PartialUpdate(invoice, newInvoice *Invoice) (Invoice, error) {
+func (im *InvoiceModel) PartialUpdate(invoice, newInvoice *Invoice) (Invoice, error) {
 	it := reflect.TypeOf(*newInvoice)
 	rv := reflect.ValueOf(*newInvoice)
 
-	for j := 0; j < rv.NumField(); j++ {
-		if !isEmpty(rv.Field(j).Interface()) {
-			sqlField := it.Field(j).Tag.Get("sql")
+	for i := 0; i < rv.NumField(); i++ {
+		if !isEmpty(rv.Field(i).Interface()) {
+			sqlField := it.Field(i).Tag.Get("sql")
 			stmt := fmt.Sprintf("UPDATE invoices SET %s=$1 WHERE id=%d", sqlField, invoice.ID)
-			_, err := i.db.Query(stmt, rv.Field(j).Interface())
+			_, err := im.db.Query(stmt, rv.Field(i).Interface())
 			if err != nil {
 				return *invoice, err
 			}
 
 		}
 	}
-	return i.ByID(invoice.ID)
+	return im.ByID(invoice.ID)
 }
 
 func isEmpty(i interface{}) bool {

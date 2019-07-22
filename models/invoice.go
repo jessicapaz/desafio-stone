@@ -52,15 +52,7 @@ func NewInvoiceModel(db *sql.DB) *InvoiceModel {
 // Create creates a invoice on database
 func (im *InvoiceModel) Create(invoice *Invoice) (Invoice, error) {
 	newInvoice := Invoice{}
-	stmt := `INSERT INTO invoices (
-		reference_month,
-		reference_year,
-		document,
-		description,
-		amount,
-		is_active,
-		created_at
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;`
+	stmt := `INSERT INTO invoices (reference_month, reference_year, document, description, amount, is_active, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;`
 	result := im.db.QueryRow(stmt, invoice.ReferenceMonth, invoice.ReferenceYear, invoice.Document, invoice.Description, invoice.Amount, active, time.Now())
 	err := result.Scan(&newInvoice.ID, &newInvoice.ReferenceMonth, &newInvoice.ReferenceYear, &newInvoice.Document, &newInvoice.Description, &newInvoice.Amount, &newInvoice.IsActive, &newInvoice.CreatedAt, &newInvoice.DeactivatedAt)
 	if err != nil {
@@ -190,6 +182,10 @@ func (im *InvoiceModel) Update(invoice, newInvoice *Invoice) (Invoice, error) {
 
 // PartialUpdate updates a invoice on database
 func (im *InvoiceModel) PartialUpdate(invoice, newInvoice *Invoice) (Invoice, error) {
+
+	isEmpty := func(i interface{}) bool {
+		return reflect.Zero(reflect.TypeOf(i)).Interface() == i
+	}
 	it := reflect.TypeOf(*newInvoice)
 	rv := reflect.ValueOf(*newInvoice)
 
@@ -205,8 +201,4 @@ func (im *InvoiceModel) PartialUpdate(invoice, newInvoice *Invoice) (Invoice, er
 		}
 	}
 	return im.ByID(invoice.ID)
-}
-
-func isEmpty(i interface{}) bool {
-	return reflect.Zero(reflect.TypeOf(i)).Interface() == i
 }
